@@ -1,0 +1,24 @@
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Build directory
+/target
+
+# IntelliJ / VS Code files
+*.iml
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Environment files
+.env
+*.db
