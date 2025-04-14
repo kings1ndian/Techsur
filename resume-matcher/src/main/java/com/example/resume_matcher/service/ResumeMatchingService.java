@@ -24,38 +24,54 @@ public class ResumeMatchingService {
 
     private String buildPrompt(String resume, String jobDescription) {
         return String.format("""
-            You are an expert AI Resume Matcher. Analyze the following resume and job description:
-            
-            RESUME:
-            %s
-            
-            JOB DESCRIPTION:
-            %s
-            
-            Please provide the following in valid JSON format:
-            1. A matching score from 0.0 to 1.0
-            2. A brief summary of the match
-            3. A list of strengths (the candidate's qualifications that match the job)
-            4. A list of weaknesses (areas where the candidate may lack required qualifications)
-            5. A fit percentage (0-100)
-            6. A list of extracted skills from the resume
-            7. A list of extracted experience items relevant to the job
-            8. A list of relevant keywords found in both the resume and job description
-            
-            Format your response as a valid JSON object with the following structure:
-            {
-                "matchingScore": 0.75,
-                "summary": "The candidate is a good match for...",
-                "strengths": ["Strength 1", "Strength 2"...],
-                "weaknesses": ["Weakness 1", "Weakness 2"...],
-                "fitPercentage": 75.0,
-                "extractedSkills": ["Skill 1", "Skill 2"...],
-                "extractedExperience": ["Experience 1", "Experience 2"...],
-                "relevantKeywords": ["Keyword 1", "Keyword 2"...]
-            }
-            
-            Your response should only contain the JSON object and nothing else.
-            """, resume, jobDescription);
+        You are an expert AI Resume Matcher with a critical eye for detail.
+         Analyze the following resume and job description with precision, always compare the 
+         resume only with job description , it should match based on its semantics keyword only
+         if there are no or less matches please return a bad score always both are text
+         
+        If the job description starts with none or resume is not given
+        give 0 and return there is no match
+        
+        RESUME:
+        %s
+        
+        JOB DESCRIPTION:
+        %s
+        
+        Your task is to perform an extremely detailed and critical evaluation:
+        
+        Rule 1. Assign a matching score from 0.0 to 1.0:
+           - 0.0-0.2: If the job description is "none" or not given
+           - 0.3-0.4: good skills, minimal alignment
+           - 0.5-0.6: very good match with some relevant skills but significant gaps
+           - 0.7-0.8: perfect match with most key requirements met
+           - 0.9-1.0: Exceptional match with nearly all requirements met
+        
+        Rule 2. Provide a detailed fitPercentage (0-100) that matches your score multiplied by 100
+        
+        Rule 3. Create a comprehensive analysis including:
+           - An honest summary highlighting match quality
+           - Specific strengths where the candidate meets requirements
+           - Clear weaknesses and gaps between the candidate and job requirements
+           - Precise skills extracted from the resume
+           - Relevant experience items from the resume
+           - Keywords found in both documents
+       
+        
+        Format your response as a valid JSON object with the following structure:
+        {
+            "matchingScore": [0.0-1.0 value],
+            "summary": "Detailed assessment...",
+            "strengths": ["Strength 1", "Strength 2"...],
+            "weaknesses": ["Weakness 1", "Weakness 2"...],
+            "fitPercentage": [0-100 value],
+            "extractedSkills": ["Skill 1", "Skill 2"...],
+            "extractedExperience": ["Experience 1", "Experience 2"...],
+            "relevantKeywords": ["Keyword 1", "Keyword 2"...]
+        }
+        
+        Your response must only contain the JSON object and nothing else.
+        """, resume, jobDescription);
     }
 
     private ResumeMatchingResponse parseOllamaResponse(String responseContent) {

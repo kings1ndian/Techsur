@@ -20,10 +20,17 @@ public class OllamaService {
     public OllamaResponse generateResponse(String prompt) {
         String apiUrl = ollamaUrl + "/api/generate";
 
+        System.out.println("Sending prompt to Ollama: " + prompt.substring(0, Math.min(100, prompt.length())) + "...");
+
         OllamaRequest request = new OllamaRequest();
         request.setModel(ollamaModel);
         request.setPrompt(prompt);
 
-        return restTemplate.postForObject(apiUrl, request, OllamaResponse.class);
+        OllamaResponse response = restTemplate.postForObject(apiUrl, request, OllamaResponse.class);
+
+        System.out.println("Received response from Ollama: " +
+                (response.getResponse() != null ? response.getResponse().substring(0, Math.min(100, response.getResponse().length())) + "..." : "null"));
+
+        return response;
     }
 }
