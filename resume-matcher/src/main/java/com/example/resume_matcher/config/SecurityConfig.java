@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // allow all calls to your resume‑matching API without auth
                         .requestMatchers("/api/resume-matching/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         // everything else needs authentication
                         .anyRequest().authenticated()
                 );

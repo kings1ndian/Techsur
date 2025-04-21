@@ -1,7 +1,6 @@
-// src/components/auth/Login.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/react.svg'; // Add a nice logo
+import logo from '../../assets/react.svg';
 
 function Login({ setUser }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -9,12 +8,14 @@ function Login({ setUser }) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
     
     try {
@@ -46,24 +47,58 @@ function Login({ setUser }) {
           throw new Error('Please enter a valid email address');
         }
         
+        console.log('Sending registration data:', { username, email, password });
+        
+        // Try registration
         const response = await fetch('http://localhost:8080/api/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ username, password, email }),
+          body: JSON.stringify({ 
+            username,
+            email,
+            password 
+          }),
         });
         
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+        
         if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.message || 'Registration failed');
+          // Try to parse error response
+          let errorMsg = 'Registration failed';
+          if (responseText) {
+            try {
+              const errorData = JSON.parse(responseText);
+              errorMsg = errorData.message || 'Registration failed';
+            } catch (e) {
+              errorMsg = `Registration failed (${response.status})`;
+            }
+          }
+          throw new Error(errorMsg);
+        }
+
+        // Parse success response if it exists
+        let successMsg = 'Registration successful! Please log in.';
+        if (responseText) {
+          try {
+            const successData = JSON.parse(responseText);
+            successMsg = successData.message || successMsg;
+          } catch (e) {
+            // If can't parse, use default message
+          }
         }
         
-        // Switch to login view after successful registration
+        // Registration successful, switch to login
         setIsLogin(true);
-        setError('Registration successful! Please log in.');
+        setSuccess(successMsg);
+        setUsername('');
+        setPassword('');
+        setEmail('');
       }
     } catch (err) {
+      console.error('Auth error:', err);
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
@@ -86,12 +121,14 @@ function Login({ setUser }) {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {error && (
-            <div className={`mb-4 rounded-md p-4 ${
-              error.includes('successful') 
-                ? 'bg-green-50 text-green-800 border border-green-400'
-                : 'bg-red-50 text-red-800 border border-red-400'
-            }`}>
+            <div className="mb-4 rounded-md p-4 bg-red-50 text-red-800 border border-red-400">
               {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 rounded-md p-4 bg-green-50 text-green-800 border border-green-400">
+              {success}
             </div>
           )}
           
@@ -178,7 +215,11 @@ function Login({ setUser }) {
               <button
                 type="button"
                 className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError('');
+                  setSuccess('');
+                }}
               >
                 {isLogin ? 'Create a new account' : 'Sign in to existing account'}
               </button>
