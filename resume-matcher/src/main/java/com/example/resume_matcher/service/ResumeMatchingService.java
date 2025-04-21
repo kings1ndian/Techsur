@@ -25,9 +25,9 @@ public class ResumeMatchingService {
     private String buildPrompt(String resume, String jobDescription) {
         return String.format("""
         You are an expert AI Resume Matcher with a critical eye for detail.
-         Analyze the following resume and job description with precision, always compare the 
-         resume only with job description , it should match based on its semantics keyword only
-         if there are no or less matches please return a bad score always both are text
+        Analyze the following resume and job description with precision, always compare the 
+        resume only with job description , it should match based on its semantics keyword only
+        if there are no or less matches please return a bad score always both are text
          
         If the job description starts with none or resume is not given
         give 0 and return there is no match
