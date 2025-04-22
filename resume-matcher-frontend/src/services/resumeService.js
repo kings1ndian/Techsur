@@ -12,7 +12,7 @@ const getAuthHeader = () => {
 
 // const API_URL = 'http://localhost:8080/api/resume-matching';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api/resume-matching';
+const API_URL = import.meta.env.VITE_API_URL || 'https://techsur-3.onrender.com/api/resume-matching';
 
 const resumeService = {
   matchResume: async (resumeText, jobDescription) => {
