@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/react.svg';
 
 // Use environment variable or fallback
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = 'http://localhost:8080';
 
 function Login({ setUser }) {
   const [isLogin, setIsLogin] = useState(true);
