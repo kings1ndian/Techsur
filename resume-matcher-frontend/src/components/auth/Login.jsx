@@ -68,20 +68,45 @@ function Login({ setUser }) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* —————— Brand Header —————— */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <img className="mx-auto h-12 w-auto" src={logo} alt="Resume Matcher" />
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h1 className="text-center text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+          ResumeMatch.ai
+        </h1>
+        <p className="mt-2 text-center text-sm text-gray-500">
+          Your AI‑powered career companion
+        </p>
+
+        {/* —————— Form Logo & Heading —————— */}
+        <img
+          className="mx-auto h-12 w-auto mt-6"
+          src={logo}
+          alt="ResumeMatch.ai logo"
+        />
+        <h2 className="mt-4 text-center text-2xl font-semibold text-gray-800">
           {isLogin ? 'Sign in to your account' : 'Create a new account'}
         </h2>
       </div>
 
+      {/* —————— Form Container —————— */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {error && <div className="mb-4 rounded-md p-4 bg-red-50 text-red-800 border border-red-400">{error}</div>}
-          {success && <div className="mb-4 rounded-md p-4 bg-green-50 text-green-800 border border-green-400">{success}</div>}
+          {error && (
+            <div className="mb-4 rounded-md p-4 bg-red-50 text-red-800 border border-red-400">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 rounded-md p-4 bg-green-50 text-green-800 border border-green-400">
+              {success}
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
+              </label>
               <div className="mt-1">
                 <input
                   id="username"
@@ -97,7 +122,9 @@ function Login({ setUser }) {
 
             {!isLogin && (
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email address
+                </label>
                 <div className="mt-1">
                   <input
                     id="email"
@@ -114,7 +141,9 @@ function Login({ setUser }) {
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
               <div className="mt-1">
                 <input
                   id="password"
@@ -147,7 +176,7 @@ function Login({ setUser }) {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">
-                  {isLogin ? 'New to Resume Matcher?' : 'Already have an account?'}
+                  {isLogin ? 'New to Resume Match.ai?' : 'Already have an account?'}
                 </span>
               </div>
             </div>
