@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/react.svg';
 
+// Use environment variable or fallback
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 function Login({ setUser }) {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
@@ -19,80 +22,38 @@ function Login({ setUser }) {
     setLoading(true);
     
     try {
+      const endpoint = isLogin ? 'login' : 'register';
+      const url = `${API_URL}/api/auth/${endpoint}`;
+      const payload = isLogin
+        ? { username, password }
+        : { username, email, password };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await response.text();
+
+      if (!response.ok) {
+        let msg = isLogin ? 'Invalid credentials' : 'Registration failed';
+        try {
+          const data = JSON.parse(text);
+          msg = data.message || msg;
+        } catch {}
+        throw new Error(msg);
+      }
+
       if (isLogin) {
-        // Login
-        const response = await fetch('http://localhost:8080/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        });
-        
-        if (!response.ok) {
-          throw new Error('Invalid username or password');
-        }
-        
-        const data = await response.json();
-        localStorage.setItem('user', JSON.stringify({ 
-          username: data.username,
-          token: data.token 
-        }));
-        
+        const data = JSON.parse(text);
+        localStorage.setItem('user', JSON.stringify({ username: data.username, token: data.token }));
         setUser({ username: data.username, token: data.token });
         navigate('/dashboard');
       } else {
-        // Register
-        if (!email.includes('@')) {
-          throw new Error('Please enter a valid email address');
-        }
-        
-        console.log('Sending registration data:', { username, email, password });
-        
-        // Try registration
-        const response = await fetch('http://localhost:8080/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            username,
-            email,
-            password 
-          }),
-        });
-        
-        const responseText = await response.text();
-        console.log('Raw response:', responseText);
-        
-        if (!response.ok) {
-          // Try to parse error response
-          let errorMsg = 'Registration failed';
-          if (responseText) {
-            try {
-              const errorData = JSON.parse(responseText);
-              errorMsg = errorData.message || 'Registration failed';
-            } catch (e) {
-              errorMsg = `Registration failed (${response.status})`;
-            }
-          }
-          throw new Error(errorMsg);
-        }
-
-        // Parse success response if it exists
-        let successMsg = 'Registration successful! Please log in.';
-        if (responseText) {
-          try {
-            const successData = JSON.parse(responseText);
-            successMsg = successData.message || successMsg;
-          } catch (e) {
-            // If can't parse, use default message
-          }
-        }
-        
-        // Registration successful, switch to login
+        const data = JSON.parse(text);
         setIsLogin(true);
-        setSuccess(successMsg);
+        setSuccess(data.message || 'Registration successful! Please log in.');
         setUsername('');
         setPassword('');
         setEmail('');
@@ -108,11 +69,7 @@ function Login({ setUser }) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <img
-          className="mx-auto h-12 w-auto"
-          src={logo}
-          alt="Resume Matcher"
-        />
+        <img className="mx-auto h-12 w-auto" src={logo} alt="Resume Matcher" />
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {isLogin ? 'Sign in to your account' : 'Create a new account'}
         </h2>
@@ -120,23 +77,11 @@ function Login({ setUser }) {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {error && (
-            <div className="mb-4 rounded-md p-4 bg-red-50 text-red-800 border border-red-400">
-              {error}
-            </div>
-          )}
-          
-          {success && (
-            <div className="mb-4 rounded-md p-4 bg-green-50 text-green-800 border border-green-400">
-              {success}
-            </div>
-          )}
-          
+          {error && <div className="mb-4 rounded-md p-4 bg-red-50 text-red-800 border border-red-400">{error}</div>}
+          {success && <div className="mb-4 rounded-md p-4 bg-green-50 text-green-800 border border-green-400">{success}</div>}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
               <div className="mt-1">
                 <input
                   id="username"
@@ -152,9 +97,7 @@ function Login({ setUser }) {
 
             {!isLogin && (
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email address
-                </label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
                 <div className="mt-1">
                   <input
                     id="email"
@@ -171,9 +114,7 @@ function Login({ setUser }) {
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
               <div className="mt-1">
                 <input
                   id="password"
