@@ -9,7 +9,8 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173") // Specify your frontend URL instead of *
+                .allowedOrigins("http://localhost:5173",  // Local development
+                        "https://resume-matcher-frontend-eut02awxl-abhisheks-projects-91953604.vercel.app" ) // Specify your frontend URL instead of *
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(false); // Set to false if not using credentials
